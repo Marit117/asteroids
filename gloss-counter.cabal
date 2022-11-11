@@ -23,4 +23,5 @@ executable gloss-counter
                      , Update
                      , Bullet
                      , Asteroid
+                     , Collision
   default-language:    Haskell2010

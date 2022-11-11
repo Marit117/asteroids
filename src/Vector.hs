@@ -13,6 +13,10 @@ vectorScale (x, y) n = (x * n, y * n)
 vectorMod :: Vector -> Float -> Vector
 vectorMod (x, y) f = (mod' (x + 400) f - 400, mod' (y + 400) f - 400)
 
+vectorCollision :: Vector -> Vector -> Bool
+vectorCollision (x1, y1) (x2, y2) | abs (x1 - x2) < 15 && abs (y1 - y2) < 15 = True
+                                  | otherwise = False
+
 rotate :: Vector -> Float -> Vector
 rotate (x, y) fg = (xn, yn)
   where

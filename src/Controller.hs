@@ -9,6 +9,7 @@ import Player (movePlayer, setVelocity, setDirection, friction)
 import Bullet (updateBullets, addBullet)
 import Asteroid(moveAsteroid, updateAsteroid)
 import Data.Set (member, insert, delete)
+import Collision (asteroidBullet, bulletAsteroid, bulletPlayer, asteroidPlayer)
 
 -- | Handle one iteration of the game
 step :: Float -> GameState -> IO GameState
@@ -18,10 +19,11 @@ step secs gstate = -- Just update the elapsed time
 stepPure :: Float -> GameState -> GameState
 stepPure secs gstate = gstate { elapsedTime = timeUpdate, player = playerUpdate, bullets = bulletUpdate, asteroids = asteroidUpdate, timeEnemy = updateTime, rand = newr }
     where
-        timeUpdate = elapsedTime gstate + secs
-        playerUpdate = friction secs $ setDirection (keys gstate) secs $ setVelocity (keys gstate) secs $ movePlayer (player gstate) secs
-        bulletUpdate = updateBullets secs (bullets gstate)
-        (asteroidUpdate, updateTime, newr) = updateAsteroid (rand gstate) secs (timeEnemy gstate) (asteroids gstate)
+        timeUpdate                         = elapsedTime gstate + secs
+        playerUpdate                       = friction secs $ setDirection (keys gstate) secs $ setVelocity (keys gstate) secs $ movePlayer (player gstate) secs
+        bulletUpdate                       = updateBullets secs $ bulletPlayer (player gstate) $ bulletAsteroid (asteroids gstate) (bullets gstate)
+        (asteroidUpdate, updateTime, newr) = updateAsteroid (rand gstate) secs (timeEnemy gstate) asteroidCollisionUpdate
+        asteroidCollisionUpdate            = asteroidPlayer (player gstate) $ asteroidBullet (bullets gstate) (asteroids gstate)
 
 -- | Handle user input
 input :: Event -> GameState -> IO GameState
