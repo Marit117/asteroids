@@ -13,6 +13,15 @@ newAsteroidSpeedHigh = 1.5
 asteroidOutline :: [(Float, Float)]
 asteroidOutline =[(-10,20), (10,15), (0,5), (10,0), (15,-10), (0,-20), (-20,-10), (-20,10), (-10,20)]
 
+asteroidScaleSmall :: Float
+asteroidScaleSmall = 0.75
+
+asteroidScaleMedium :: Float
+asteroidScaleMedium = 1
+
+asteroidScaleLarge :: Float
+asteroidScaleLarge = 1.5
+
 -- Bullet
 bulletLifeTime :: Float
 bulletLifeTime = 2

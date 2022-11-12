@@ -3,20 +3,15 @@ import Model
 import Constants
 import Asteroid (killAsteroid)
 import Vector(vectorCollision, vectorScale)
+import Score (scoreAsteroids)
 
 -- collision for asteroids
-{-asteroidBullet :: [Bullet] -> [Asteroid] -> [Asteroid]
-asteroidBullet bs as = alive ++ killAsteroid dead
-    where
-        alive = filter ( \a -> not $ any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as -- asteroids that are NOT hit
-        dead  = filter ( \a -> any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as -- asteroids that are hit-}
-
-asteroidBullet :: [Bullet] -> ([Asteroid], [DeadAsteroid]) -> ([Asteroid], [DeadAsteroid])
-asteroidBullet bs (as, das) = (alive ++ smallerAsteroids, das ++ deadAsteroids)
+asteroidBullet :: [Bullet] -> ([Asteroid], [DeadAsteroid]) -> ([Asteroid], [DeadAsteroid], Score)
+asteroidBullet bs (as, das) = (alive ++ smallerAsteroids, das ++ deadAsteroids, scoreAsteroids hit)
     where
         (smallerAsteroids, deadAsteroids) = killAsteroid hit
         alive = filter ( \a -> not $ any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as
-        hit  = filter ( \a -> any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as
+        hit   = filter ( \a -> any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as
 
 asteroidPlayer :: Player -> ([Asteroid], [DeadAsteroid]) -> ([Asteroid], [DeadAsteroid])
 asteroidPlayer p (as, das) = (alive ++ smallerAsteroids, das ++ deadAsteroids)

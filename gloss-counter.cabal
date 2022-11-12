@@ -29,4 +29,6 @@ executable gloss-counter
                      , ViewPaused
                      , ViewGameOver
                      , Constants
+                     , Score
+                     , HighScore
   default-language:    Haskell2010

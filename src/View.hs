@@ -8,11 +8,10 @@ import ViewPaused (viewPausedState)
 import ViewGameOver (viewGameOverState)
 
 view :: GameState -> IO Picture
-view = return . viewPure
+view =return . viewPure
 
 viewPure :: GameState -> Picture
 viewPure gstate = case viewState gstate of
                   Game     -> viewGstate gstate
                   Paused   -> viewPausedState gstate
-                  GameOver -> viewGameOverState gstate
-                  
+                  GameOver -> viewGameOverState gstate                

@@ -6,7 +6,8 @@ import Data.Set (Set, empty)
 import System.Random (StdGen, mkStdGen)
 
 -- GameState
-data GameState = GameState {   score         :: Int,
+data GameState = GameState {   score         :: Score,
+                               highscores    :: Maybe [Score],
                                player        :: Player,
                                asteroids     :: [Asteroid],
                                timeEnemy     :: Float,
@@ -17,11 +18,12 @@ data GameState = GameState {   score         :: Int,
                                viewState     :: ViewState,
                                elapsedTime   :: Float,
                                rand          :: StdGen
-                             }
+                           }
 
 initialState :: StdGen -> GameState
 initialState r = GameState {
                            score         = 0,
+                           highscores    = Nothing,
                            player        = Player {lives = 3, timeSinceHit = 0, angle = 0, direction = (0, 1), locationPlayer = (LocationData {velocity = (0,0), position = (0,0)})},
                            asteroids     = [],
                            timeEnemy     = 0,
@@ -32,7 +34,7 @@ initialState r = GameState {
                            viewState     = Game,
                            elapsedTime   = 0,
                            rand          = r
-                          }
+                           }
     --where
         --(newAsteroid, newr) = asteroidRandom r
 
@@ -66,8 +68,9 @@ data Bullet = Bullet { locationBullet :: LocationData,
                      }
 
 -- Ufo
-data Ufo = Ufo { aim         :: Aim,
-                 locationUfo :: LocationData
+data Ufo = Ufo { aim           :: Aim,
+                 timeSinceShot :: Float,
+                 locationUfo   :: LocationData
                }
 
 data Aim = RandomAim | PlayerAim
@@ -78,6 +81,8 @@ data LocationData = LocationData { velocity :: Velocity,
                                  }
 
 -- Types
-type Vector = (Float, Float)
+type Score    = Int
+type Time     = Float
+type Vector   = (Float, Float)
 type Position = Vector
 type Velocity = Vector

@@ -9,26 +9,32 @@ import Player (updatePlayerMovement, updatePlayerLives, updateTimeSinceHit, play
 import Bullet (updateBullets, addBullet)
 import Asteroid(moveAsteroid, updateAsteroid)
 import DeadAsteroid (updateDeadAsteroid)
+import HighScore (readHighScores)
+import Data.Maybe (isNothing)
 import Data.Set (member, insert, delete)
 import Collision
 
 -- | Handle one iteration of the game
-step :: Float -> GameState -> IO GameState
-step secs gstate = -- Just update the elapsed time
-    return $ stepPure secs gstate
+step :: Time -> GameState -> IO GameState -- Just update the elapsed time
+step secs gstate | viewState gstate == GameOver && isNothing (highscores gstate)= do
+                                                highScores <- readHighScores (score gstate)
+                                                return gstate {highscores = Just highScores}
+                 | otherwise = return $ stepPure secs gstate
 
-stepPure :: Float -> GameState -> GameState
+stepPure :: Time -> GameState -> GameState
 stepPure secs gstate | viewState gstate /= Game = gstate
-                     | otherwise = gstate { elapsedTime = timeUpdate, player = playerUpdate, bullets = bulletUpdate, asteroids = asteroidUpdate, 
-                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, viewState = playerDie gstate, rand = newr }
+                     | otherwise = gstate { elapsedTime = timeUpdate, player = playerUpdate, bullets = bulletUpdate, asteroids = asteroidUpdate,
+                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, viewState = playerDie gstate, rand = newr,
+                                            score = scoreUpdate }
     where
-        timeUpdate                         = elapsedTime gstate + secs
-        playerUpdate                       = playerLives $ updatePlayerMovement (keys gstate) secs $ updateTimeSinceHit secs (player gstate)
-        playerLives                        = updatePlayerLives (playerBullet (bullets gstate) (player gstate)) (playerAsteroid (asteroids gstate) (player gstate))
-        bulletUpdate                       = updateBullets secs $ bulletPlayer (player gstate) $ bulletAsteroid (asteroids gstate) (bullets gstate)
-        deadAsteroidUpdate                 = updateDeadAsteroid secs deadAsteroidCollision
-        (asteroidUpdate, updateTime, newr) = updateAsteroid (rand gstate) secs (timeEnemy gstate) asteroidCollision
-        (asteroidCollision, deadAsteroidCollision) = asteroidPlayer (player gstate) $ asteroidBullet (bullets gstate) (asteroids gstate, deadAsteroids gstate)
+        timeUpdate                              = elapsedTime gstate + secs
+        playerUpdate                            = playerLives $ updatePlayerMovement (keys gstate) secs $ updateTimeSinceHit secs (player gstate)
+        playerLives                             = updatePlayerLives (playerBullet (bullets gstate) (player gstate)) (playerAsteroid (asteroids gstate) (player gstate))
+        bulletUpdate                            = updateBullets secs $ bulletPlayer (player gstate) $ bulletAsteroid (asteroids gstate) (bullets gstate)
+        deadAsteroidUpdate                      = updateDeadAsteroid secs deadAsCollision
+        (asteroidUpdate, updateTime, newr)      = updateAsteroid (rand gstate) secs (timeEnemy gstate) asCollision
+        scoreUpdate                             = score gstate + scoreAs
+        (asCollision, deadAsCollision, scoreAs) = asteroidBullet (bullets gstate) $ asteroidPlayer (player gstate) (asteroids gstate, deadAsteroids gstate)
 
 
 -- | Handle user input

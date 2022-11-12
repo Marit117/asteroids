@@ -6,14 +6,14 @@ import Vector(rotate, vectorScale)
 import Update (updatePosition)
 
 -- Asteroid Movement
-updateAsteroid :: StdGen -> Float -> Float -> [Asteroid] -> ([Asteroid], Float, StdGen)
+updateAsteroid :: StdGen -> Float -> Time -> [Asteroid] -> ([Asteroid], Float, StdGen)
 updateAsteroid r secs timeEnemy as = addAsteroid r secs (moveAsteroid secs as, timeEnemy)
 
 moveAsteroid :: Float -> [Asteroid] -> [Asteroid]
 moveAsteroid secs = map (\a -> a { locationAsteroid = updatePosition (locationAsteroid a) secs})
 
 -- Asteroid added every few seconds
-addAsteroid :: StdGen -> Float -> ([Asteroid], Float) -> ([Asteroid], Float, StdGen)
+addAsteroid :: StdGen -> Time -> ([Asteroid], Float) -> ([Asteroid], Float, StdGen)
 addAsteroid r secs (as, timeEnemy) | (secs + timeEnemy) > timeAddAsteroid = (newa : as, 0, newr)
                                    | otherwise = (as, secs + timeEnemy, r)
     where
