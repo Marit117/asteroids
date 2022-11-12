@@ -1,12 +1,8 @@
 module Bullet where
-import LocationData (LocationData(LocationData, position, velocity))
+import Model
+import Constants
 import Update (updatePosition, updateVelocity)
-import Player (Player(..), locationPlayer)
 import Vector (vectorScale, vectorAdd)
-
-data Bullet = Bullet { locationBullet :: LocationData,
-                       lifeTime       :: Float
-                     }
 
 updateBullets :: Float -> [Bullet] -> [Bullet]
 updateBullets secs bs = updateLifetime secs (moveBullets secs (removeBullet bs))
@@ -17,11 +13,11 @@ moveBullets secs = map (\b -> b { locationBullet = updatePosition (locationBulle
 updateLifetime :: Float -> [Bullet] -> [Bullet]
 updateLifetime secs = map (\b -> b { lifeTime = lifeTime b - secs})
 
-addBullet :: Player -> [Bullet] -> [Bullet]
-addBullet p bs  = Bullet (LocationData vel pos ) 2 : bs
-    where
-        vel = vectorAdd (vectorScale (direction p) 300) (velocity (locationPlayer p))
-        pos = vectorAdd (position (locationPlayer p)) (vectorScale (direction p) 25)
-
 removeBullet :: [Bullet] -> [Bullet]
-removeBullet = filter (\bullet -> lifeTime bullet > 0)
+removeBullet = filter (\bullet -> lifeTime bullet > bulletTimeDie)
+
+addBullet :: Player -> [Bullet] -> [Bullet]
+addBullet p bs  = Bullet (LocationData vel pos ) bulletLifeTime : bs
+    where
+        vel = vectorAdd (vectorScale (direction p) bulletSpeed) (velocity (locationPlayer p))
+        pos = vectorAdd (vectorScale (direction p) bulletStartPosition) (position (locationPlayer p))

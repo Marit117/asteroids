@@ -1,6 +1,6 @@
 module Update where
-import LocationData (LocationData (position, velocity), Velocity)
-import Vector
+import Model
+import Vector ( vectorAdd, vectorScale, vectorMod )
 
 updatePosition :: LocationData -> Float -> LocationData
 updatePosition l secs = updateBorders $ l{ position = vectorAdd (position l) (vectorScale (velocity l) secs) }

@@ -18,10 +18,15 @@ executable gloss-counter
                      , Model
                      , View
                      , Player
-                     , LocationData
                      , Vector
                      , Update
                      , Bullet
                      , Asteroid
+                     , DeadAsteroid
+                     , Ufo
                      , Collision
+                     , ViewGamestate
+                     , ViewPaused
+                     , ViewGameOver
+                     , Constants
   default-language:    Haskell2010

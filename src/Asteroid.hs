@@ -1,26 +1,20 @@
 module Asteroid where
-import LocationData (LocationData (LocationData, velocity, position))
+import Model
+import Constants
 import System.Random (StdGen, Random (randomR))
-import Vector(Vector, rotate, vectorCollision, vectorScale)
+import Vector(rotate, vectorScale)
 import Update (updatePosition)
-import Bullet (Bullet (locationBullet))
 
-data Asteroid = Asteroid { size             :: AsteroidSize,
-                           locationAsteroid :: LocationData
-                         }
-
-data AsteroidSize = Small | Medium | Large
-    deriving (Eq, Ord, Enum)
-    --pred large = medium
-
+-- Asteroid Movement
 updateAsteroid :: StdGen -> Float -> Float -> [Asteroid] -> ([Asteroid], Float, StdGen)
 updateAsteroid r secs timeEnemy as = addAsteroid r secs (moveAsteroid secs as, timeEnemy)
 
 moveAsteroid :: Float -> [Asteroid] -> [Asteroid]
 moveAsteroid secs = map (\a -> a { locationAsteroid = updatePosition (locationAsteroid a) secs})
 
+-- Asteroid added every few seconds
 addAsteroid :: StdGen -> Float -> ([Asteroid], Float) -> ([Asteroid], Float, StdGen)
-addAsteroid r secs (as, timeEnemy) | (secs + timeEnemy) > 5 = (newa : as, 0, newr)
+addAsteroid r secs (as, timeEnemy) | (secs + timeEnemy) > timeAddAsteroid = (newa : as, 0, newr)
                                    | otherwise = (as, secs + timeEnemy, r)
     where
         (newa, newr) = asteroidRandom r
@@ -34,9 +28,12 @@ asteroidRandom r1 = (Asteroid {size = Large, locationAsteroid = locdata}, r3)
         pos = (posx, 400)
         (posx, r3) = randomR (-400, 400) r2
 
-killAsteroid :: [Asteroid] -> [Asteroid]
-killAsteroid [] = []
-killAsteroid (a:as) | size a > Small =
-                        Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) 0.5}} :
-                        Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) 1.25}} : killAsteroid as
-                    | otherwise = killAsteroid as
+-- Asteroids that are hit break into two smaller asteroids
+-- if they cannot go smaller, they are dead
+killAsteroid :: [Asteroid] -> ([Asteroid], [DeadAsteroid])
+killAsteroid [] = ([], [])
+killAsteroid (a:as) | size a > Small = let (alive, dead) = killAsteroid as in
+                        (Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) newAsteroidSpeedLow}} :
+                         Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) newAsteroidSpeedHigh}} : 
+                         alive, dead)
+                    | otherwise = let (alive, dead) = killAsteroid as in (alive, DeadAsteroid {deathPosition = position (locationAsteroid a), timeSinceDeath = 0} : dead)

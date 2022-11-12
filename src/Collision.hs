@@ -1,40 +1,48 @@
 module Collision where
-import Bullet (Bullet (locationBullet))
-import Asteroid (Asteroid (Asteroid, locationAsteroid, size), AsteroidSize(..), killAsteroid)
-import Vector(Vector, vectorCollision, vectorScale)
-import LocationData (LocationData (position, velocity))
-import Player (Player(locationPlayer, lives))
-
+import Model
+import Constants
+import Asteroid (killAsteroid)
+import Vector(vectorCollision, vectorScale)
 
 -- collision for asteroids
-asteroidBullet :: [Bullet] -> [Asteroid] -> [Asteroid]
+{-asteroidBullet :: [Bullet] -> [Asteroid] -> [Asteroid]
 asteroidBullet bs as = alive ++ killAsteroid dead
     where
-        alive = filter ( \a -> not $ any (`asteroidCollision` a) bs) as
-        dead  = filter ( \a -> any (`asteroidCollision` a) bs) as
+        alive = filter ( \a -> not $ any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as -- asteroids that are NOT hit
+        dead  = filter ( \a -> any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as -- asteroids that are hit-}
 
-asteroidCollision :: Bullet -> Asteroid -> Bool
-asteroidCollision b a = vectorCollision (position (locationBullet b)) (position (locationAsteroid a))
-
-asteroidPlayer :: Player -> [Asteroid] -> [Asteroid]
-asteroidPlayer p as = alive ++ killAsteroid dead
+asteroidBullet :: [Bullet] -> ([Asteroid], [DeadAsteroid]) -> ([Asteroid], [DeadAsteroid])
+asteroidBullet bs (as, das) = (alive ++ smallerAsteroids, das ++ deadAsteroids)
     where
-        alive = filter ( \a -> not $ vectorCollision (position (locationAsteroid a)) (position (locationPlayer p))) as
-        dead  = filter ( \a -> vectorCollision (position (locationAsteroid a)) (position (locationPlayer p))) as
+        (smallerAsteroids, deadAsteroids) = killAsteroid hit
+        alive = filter ( \a -> not $ any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as
+        hit  = filter ( \a -> any (\b -> collisionAsteroid (position (locationBullet b)) a) bs) as
+
+asteroidPlayer :: Player -> ([Asteroid], [DeadAsteroid]) -> ([Asteroid], [DeadAsteroid])
+asteroidPlayer p (as, das) = (alive ++ smallerAsteroids, das ++ deadAsteroids)
+    where
+        (smallerAsteroids, deadAsteroids) = killAsteroid hit
+        alive = filter ( not . collisionAsteroid (position (locationPlayer p))) as
+        hit   = filter ( collisionAsteroid (position (locationPlayer p))) as
+
+collisionAsteroid :: Vector -> Asteroid -> Bool
+collisionAsteroid v a = vectorCollision v (position (locationAsteroid a)) n
+    where
+        n = case size a of -- different size asteroids should have a different radius for collision
+          Small  -> asteroidSmallCollision
+          Medium -> asteroidMediumCollision
+          Large  -> asteroidLargeCollision
 
 -- collision for bullets
 bulletAsteroid :: [Asteroid] -> [Bullet] -> [Bullet]
-bulletAsteroid as = filter ( \b -> not $ any (`bulletCollision` b) as)
-
-bulletCollision :: Asteroid -> Bullet -> Bool
-bulletCollision a b = vectorCollision (position (locationBullet b)) (position (locationAsteroid a))
+bulletAsteroid as = filter ( \b -> not $ any (collisionAsteroid (position (locationBullet b))) as)
 
 bulletPlayer :: Player -> [Bullet] -> [Bullet]
-bulletPlayer p = filter (\b -> not $ vectorCollision (position (locationBullet b)) (position (locationPlayer p)))
+bulletPlayer p = filter (\b -> not $ vectorCollision (position (locationBullet b)) (position (locationPlayer p)) bulletPlayerCollision)
 
 -- collision for player
 playerBullet :: [Bullet] -> Player -> Bool
-playerBullet bs p = any (\b -> vectorCollision (position (locationBullet b)) (position (locationPlayer p))) bs
+playerBullet bs p = any (\b -> vectorCollision (position (locationBullet b)) (position (locationPlayer p)) bulletPlayerCollision) bs
 
 playerAsteroid :: [Asteroid] -> Player -> Bool
-playerAsteroid as p = any (\a -> vectorCollision (position (locationAsteroid a)) (position (locationPlayer p))) as
+playerAsteroid as p = any (collisionAsteroid (position (locationPlayer p))) as
