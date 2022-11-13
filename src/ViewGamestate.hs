@@ -6,7 +6,7 @@ import Vector (vectorScale)
 
 viewGstate :: GameState -> Picture
 viewGstate gstate = Pictures [viewScore (score gstate), viewLives (player gstate), viewPlayer (player gstate), Pictures (viewBullets (bullets gstate)), 
-                              Pictures (viewAsteroids (asteroids gstate)), Pictures (viewDeadAsteroids (deadAsteroids gstate))]
+                              Pictures (viewAsteroids (asteroids gstate)), Pictures (viewDeadAsteroids (deadAsteroids gstate)), Pictures (viewUfo (ufos gstate))]
 
 viewLives :: Player -> Picture
 viewLives p = translate (-375) 350 $ scale 0.2 0.2 $ color white $ Text ("Lives: " ++ show (lives p))

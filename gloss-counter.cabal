@@ -14,21 +14,27 @@ executable gloss-counter
                        random,
                        containers
   hs-source-dirs:      src
-  other-modules:       Controller
-                     , Model
-                     , View
-                     , Player
-                     , Vector
-                     , Update
+  other-modules:       Player
                      , Bullet
+                     , Enemy
                      , Asteroid
                      , DeadAsteroid
                      , Ufo
                      , Collision
+                     , CollisionAsteroid
+                     , CollisionBullet
+                     , CollisionPlayer
+                     , CollisionUfo
+                     , Vector
+                     , Update
+                     , Constants
+                     , Model
+                     , InitialState
+                     , Controller
+                     , View
                      , ViewGamestate
                      , ViewPaused
                      , ViewGameOver
-                     , Constants
                      , Score
                      , HighScore
   default-language:    Haskell2010

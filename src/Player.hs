@@ -2,6 +2,7 @@ module Player where
 import Model
 import Constants
 import Vector ( rotate, vectorScale, vectorAdd)
+import InitialState (initialPlayer)
 import Update (updatePosition, updateVelocity)
 import Data.Set ( Set, empty, member, insert, delete )
 import Graphics.Gloss.Interface.IO.Interact (Key(Char))
@@ -30,12 +31,12 @@ friction :: Time -> Player -> Player
 friction secs p = p {locationPlayer = updateVelocity (locationPlayer p) (vectorScale (velocity (locationPlayer p)) (playerFriction ** secs))}
 
 -- Player Lives
-updatePlayerLives :: Bool -> Bool -> Player -> Player
-updatePlayerLives collBullet collAsteroid p | (collBullet || collAsteroid) && timeSinceHit p > playerCooldown = playerRespawn p
-                                            | otherwise = p
+updatePlayerLives :: Bool -> Player -> Player
+updatePlayerLives collides p | collides && timeSinceHit p > playerCooldown = playerRespawn p
+                             | otherwise = p
 
 playerRespawn :: Player -> Player
-playerRespawn p = p { lives = lives p - 1, timeSinceHit = 0, angle = 0, direction = (0, 1), locationPlayer = (LocationData {velocity = (0,0), position = (0,0)}) }
+playerRespawn p = initialPlayer { lives = lives p - 1 }
 
 updateTimeSinceHit :: Time -> Player -> Player
 updateTimeSinceHit secs p = p {timeSinceHit = timeSinceHit p + secs}

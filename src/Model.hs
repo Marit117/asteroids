@@ -5,38 +5,27 @@ import Graphics.Gloss.Interface.IO.Game (Key)
 import Data.Set (Set, empty)
 import System.Random (StdGen, mkStdGen)
 
+-- Types
+type Score    = Int
+type Time     = Float
+type Vector   = (Float, Float)
+type Position = Vector
+type Velocity = Vector
+
 -- GameState
 data GameState = GameState {   score         :: Score,
                                highscores    :: Maybe [Score],
                                player        :: Player,
                                asteroids     :: [Asteroid],
-                               timeEnemy     :: Float,
+                               timeEnemy     :: Time,
                                deadAsteroids :: [DeadAsteroid],
                                ufos          :: [Ufo],
                                bullets       :: [Bullet],
                                keys          :: Set Key,
                                viewState     :: ViewState,
-                               elapsedTime   :: Float,
+                               elapsedTime   :: Time,
                                rand          :: StdGen
                            }
-
-initialState :: StdGen -> GameState
-initialState r = GameState {
-                           score         = 0,
-                           highscores    = Nothing,
-                           player        = Player {lives = 3, timeSinceHit = 0, angle = 0, direction = (0, 1), locationPlayer = (LocationData {velocity = (0,0), position = (0,0)})},
-                           asteroids     = [],
-                           timeEnemy     = 0,
-                           deadAsteroids = [],
-                           ufos          = [],
-                           bullets       = [],
-                           keys          = empty,
-                           viewState     = Game,
-                           elapsedTime   = 0,
-                           rand          = r
-                           }
-    --where
-        --(newAsteroid, newr) = asteroidRandom r
 
 -- ViewState
 data ViewState = Game | Paused | GameOver
@@ -44,7 +33,7 @@ data ViewState = Game | Paused | GameOver
 
 -- Player
 data Player = Player { lives          :: Int,
-                       timeSinceHit   :: Float,
+                       timeSinceHit   :: Time,
                        angle          :: Float,
                        direction      :: Vector,
                        locationPlayer :: LocationData
@@ -59,30 +48,24 @@ data AsteroidSize = Small | Medium | Large
     deriving (Eq, Ord, Enum)
 
 data DeadAsteroid = DeadAsteroid {deathPosition  :: Position,
-                                  timeSinceDeath :: Float
+                                  timeSinceDeath :: Time
                                  }
 
 -- Bullet
 data Bullet = Bullet { locationBullet :: LocationData,
-                       lifeTime       :: Float
+                       lifeTime       :: Time
                      }
 
 -- Ufo
 data Ufo = Ufo { aim           :: Aim,
-                 timeSinceShot :: Float,
+                 timeSinceShot :: Time,
                  locationUfo   :: LocationData
                }
 
-data Aim = RandomAim | PlayerAim
+data Aim = FrontAim | PlayerAim
+    deriving (Eq)
 
 -- LocationData
 data LocationData = LocationData { velocity :: Velocity,
                                    position :: Position
                                  }
-
--- Types
-type Score    = Int
-type Time     = Float
-type Vector   = (Float, Float)
-type Position = Vector
-type Velocity = Vector

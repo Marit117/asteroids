@@ -4,11 +4,12 @@ module Controller where
 import Model
 import Graphics.Gloss ()
 import Graphics.Gloss.Interface.IO.Game
-import System.Random ()
 import Player (updatePlayerMovement, updatePlayerLives, updateTimeSinceHit, playerDie)
 import Bullet (updateBullets, addBullet)
-import Asteroid(moveAsteroid, updateAsteroid)
+import Asteroid(moveAsteroid)
 import DeadAsteroid (updateDeadAsteroid)
+import Enemy (addEnemy)
+import Ufo (moveUfo, ufosShoot, ufoUpdateTime)
 import HighScore (readHighScores)
 import Data.Maybe (isNothing)
 import Data.Set (member, insert, delete)
@@ -24,17 +25,27 @@ step secs gstate | viewState gstate == GameOver && isNothing (highscores gstate)
 stepPure :: Time -> GameState -> GameState
 stepPure secs gstate | viewState gstate /= Game = gstate
                      | otherwise = gstate { elapsedTime = timeUpdate, player = playerUpdate, bullets = bulletUpdate, asteroids = asteroidUpdate,
-                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, viewState = playerDie gstate, rand = newr,
+                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, ufos = ufoUpdate, viewState = playerDie gstate, rand = newr,
                                             score = scoreUpdate }
     where
         timeUpdate                              = elapsedTime gstate + secs
+        scoreUpdate                             = score gstate + scoreAs + scoreUfo
+        
         playerUpdate                            = playerLives $ updatePlayerMovement (keys gstate) secs $ updateTimeSinceHit secs (player gstate)
-        playerLives                             = updatePlayerLives (playerBullet (bullets gstate) (player gstate)) (playerAsteroid (asteroids gstate) (player gstate))
-        bulletUpdate                            = updateBullets secs $ bulletPlayer (player gstate) $ bulletAsteroid (asteroids gstate) (bullets gstate)
+        playerLives                             = updatePlayerLives $ playerAllCollision (asteroids gstate) (bullets gstate) (ufos gstate) (player gstate)
+        
+        bulletUpdate                            = updateBullets secs bulletCollision
+        bulletCollision                         = bulletAllCollision (asteroids gstate) (ufos gstate) (player gstate) ufobullets
+        (ufosTime, ufobullets)                  = ufosShoot (player gstate) (bullets gstate) (ufos gstate)
+
         deadAsteroidUpdate                      = updateDeadAsteroid secs deadAsCollision
-        (asteroidUpdate, updateTime, newr)      = updateAsteroid (rand gstate) secs (timeEnemy gstate) asCollision
-        scoreUpdate                             = score gstate + scoreAs
-        (asCollision, deadAsCollision, scoreAs) = asteroidBullet (bullets gstate) $ asteroidPlayer (player gstate) (asteroids gstate, deadAsteroids gstate)
+
+        asteroidUpdate                          = moveAsteroid secs asAdded
+        ufoUpdate                               = moveUfo secs $ ufoUpdateTime secs ufoCollision
+        (ufoCollision, scoreUfo)                = ufoAllCollision (asteroids gstate) (bullets gstate) (player gstate) ufoAdded
+        
+        (asAdded, ufoAdded, updateTime, newr)   = addEnemy (rand gstate) secs (asCollision, ufosTime, timeEnemy gstate)
+        (asCollision, deadAsCollision, scoreAs) = asteroidAllCollision gstate
 
 
 -- | Handle user input
