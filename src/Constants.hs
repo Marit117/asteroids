@@ -37,6 +37,9 @@ randomRotation = (0, 20)
 randomChance :: (Int, Int)
 randomChance = (1, 100)
 
+timeBeforeUfo :: Float
+timeBeforeUfo = 20
+
 chanceUfoMax :: Int
 chanceUfoMax = 50
 

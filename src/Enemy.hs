@@ -11,8 +11,9 @@ addEnemy elapsedTime r secs (as, us, timeEnemy) | (secs + timeEnemy) > timeAddEn
                                     | otherwise                                     = (as, us, secs + timeEnemy, r)
 
 chooseEnemy :: (Int, StdGen) -> Float -> ([Asteroid], [Ufo]) -> ([Asteroid], [Ufo], Time, StdGen)
-chooseEnemy (number, r) elapsedTime (as, us) | number <= calculateChance elapsedTime = (as, newUfo : us, resetTime, newru)         --  chance for an ufo (chance grows after time passes, will not go higher than the maximum chance)
-                                             | otherwise                             = (newAsteroid : as, us, resetTime, newra)    --  chance for an asteroid
+chooseEnemy (number, r) elapsedTime (as, us) | number <= calculateChance elapsedTime 
+                                               && elapsedTime > timeBeforeUfo = (as, newUfo : us, resetTime, newru)         --  chance for an ufo (chance grows after time passes, will not go higher than the maximum chance)
+                                             | otherwise                      = (newAsteroid : as, us, resetTime, newra)    --  chance for an asteroid
     where
         (newUfo, newru)      = ufoRandom r
         (newAsteroid, newra) = asteroidRandom r
