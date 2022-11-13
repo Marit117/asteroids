@@ -1,7 +1,14 @@
 module Constants where
 import Graphics.Gloss (scale)
+import Graphics.Gloss.Data.Picture (translate)
 
 -- General
+framesPerSecond :: Int
+framesPerSecond = 60
+
+screenStartPosition :: (Int, Int)
+screenStartPosition = (0, 0)
+
 wholeScreen :: Float
 wholeScreen = 800
 
@@ -10,6 +17,9 @@ halfScreen = 400
 
 screenSize :: (Float, Float)
 screenSize = (-halfScreen, halfScreen)
+
+screenSizeWhole :: (Int, Int)
+screenSizeWhole = (800, 800)
 
 resetTime :: Float
 resetTime = 0
@@ -27,8 +37,11 @@ randomRotation = (0, 20)
 randomChance :: (Int, Int)
 randomChance = (1, 100)
 
-chanceUfo :: Int
-chanceUfo = 20
+chanceUfoMax :: Int
+chanceUfoMax = 50
+
+decreaseChanceSpeed :: Float
+decreaseChanceSpeed = 2
 
 -- Ufo
 ufoOutline :: [(Float, Float)]
@@ -48,7 +61,7 @@ asteroidOutline :: [(Float, Float)]
 asteroidOutline = [(-10,20), (10,15), (0,5), (10,0), (15,-10), (0,-20), (-20,-10), (-20,10), (-10,20)]
 
 newAsteroidSpeedLow :: Float
-newAsteroidSpeedLow = 0.5
+newAsteroidSpeedLow = -0.75
 
 newAsteroidSpeedHigh :: Float
 newAsteroidSpeedHigh = 1.5
@@ -113,6 +126,15 @@ asteroidMediumRadius = 20
 asteroidLargeRadius :: Float
 asteroidLargeRadius = 25
 
+asteroidPlayerRadius :: Float
+asteroidPlayerRadius = 15
+
+asteroidBulletRadius :: Float
+asteroidBulletRadius = 3
+
+asteroidUfoRadius :: Float
+asteroidUfoRadius = 20
+
 bulletPlayerRadius :: Float
 bulletPlayerRadius = 15
 
@@ -158,3 +180,18 @@ highScorePosition = 200
 
 highScoreSize :: Float
 highScoreSize = 50
+
+positionGameOver = translate (-200) 300
+positionHighScore = translate (-150) 225
+positionOwnScore = translate (-150) (-100)
+
+xPositionScores :: Float
+xPositionScores = -150
+
+-- View Game
+positionLives = translate (-375) 350
+positionScore = translate 200 350
+
+-- View Paused
+positionPaused = translate (-150) 0
+positionPressEsc = translate (-225) (-50)

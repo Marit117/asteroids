@@ -11,4 +11,4 @@ ufoPlayer :: Player -> [Ufo] -> [Ufo]
 ufoPlayer p = filter (\ufo -> not $ vectorCollision (position (locationUfo ufo)) (position (locationPlayer p)) ufoPlayerRadius)
 
 ufoAsteroid :: [Asteroid] -> [Ufo] -> [Ufo]
-ufoAsteroid as = filter ( \ufo -> not $ any (collisionAsteroid (position (locationUfo ufo))) as)
+ufoAsteroid as = filter ( \ufo -> not $ any (collisionAsteroid (position (locationUfo ufo)) asteroidUfoRadius) as)

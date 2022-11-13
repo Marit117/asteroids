@@ -4,13 +4,14 @@ import InitialState ( initialState )
 import View ( view )
 import Graphics.Gloss.Interface.IO.Game
 import System.Random (getStdGen)
+import Constants
 
 main :: IO ()
 main = do 
         rand <- getStdGen
-        playIO (InWindow "Counter" (800, 800) (0, 0)) -- Or FullScreen
+        playIO (InWindow "Counter" screenSizeWhole screenStartPosition) -- Or FullScreen
               black            -- Background color
-              60               -- Frames per second
+              framesPerSecond  -- Frames per second
               (initialState rand) -- Initial state
               view             -- View function
               input            -- Event function

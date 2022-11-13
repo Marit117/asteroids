@@ -9,10 +9,10 @@ viewGstate gstate = Pictures [viewScore (score gstate), viewLives (player gstate
                               Pictures (viewAsteroids (asteroids gstate)), Pictures (viewDeadAsteroids (deadAsteroids gstate)), Pictures (viewUfo (ufos gstate))]
 
 viewLives :: Player -> Picture
-viewLives p = translate (-375) 350 $ smallerText $ color white $ Text ("Lives: " ++ show (lives p))
+viewLives p = positionLives $ smallerText $ color white $ Text ("Lives: " ++ show (lives p))
 
 viewScore :: Int -> Picture
-viewScore score = translate 200 350 $ smallerText $ color white $ Text ("Score: " ++ show score)
+viewScore score = positionScore $ smallerText $ color white $ Text ("Score: " ++ show score)
 
 viewPlayer :: Player -> Picture
 viewPlayer p = uncurry translate (position (locationPlayer p)) $ rotate (angle p) $ color white $ Polygon playerOutline

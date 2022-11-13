@@ -25,7 +25,7 @@ step secs gstate | viewState gstate == GameOver && isNothing (highscores gstate)
 stepPure :: Time -> GameState -> GameState
 stepPure secs gstate | viewState gstate /= Game = gstate
                      | otherwise = gstate { elapsedTime = timeUpdate, player = playerUpdate, bullets = bulletUpdate, asteroids = asteroidUpdate,
-                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, ufos = ufoUpdate, viewState = playerDie gstate, rand = newr,
+                                            timeEnemy = updateTime, deadAsteroids = deadAsteroidUpdate, ufos = ufosTime, viewState = playerDie gstate, rand = newr,
                                             score = scoreUpdate }
     where
         timeUpdate                              = elapsedTime gstate + secs
@@ -36,7 +36,7 @@ stepPure secs gstate | viewState gstate /= Game = gstate
         
         bulletUpdate                            = updateBullets secs bulletCollision
         bulletCollision                         = bulletAllCollision (asteroids gstate) (ufos gstate) (player gstate) ufobullets
-        (ufosTime, ufobullets)                  = ufosShoot (player gstate) (bullets gstate) (ufos gstate)
+        (ufosTime, ufobullets)                  = ufosShoot (player gstate) (bullets gstate) ufoUpdate
 
         deadAsteroidUpdate                      = updateDeadAsteroid secs deadAsCollision
 
@@ -44,7 +44,7 @@ stepPure secs gstate | viewState gstate /= Game = gstate
         ufoUpdate                               = moveUfo secs $ ufoUpdateTime secs ufoCollision
         (ufoCollision, scoreUfo)                = ufoAllCollision (asteroids gstate) (bullets gstate) (player gstate) ufoAdded
         
-        (asAdded, ufoAdded, updateTime, newr)   = addEnemy (rand gstate) secs (asCollision, ufosTime, timeEnemy gstate)
+        (asAdded, ufoAdded, updateTime, newr)   = addEnemy (elapsedTime gstate) (rand gstate) secs (asCollision, ufos gstate, timeEnemy gstate)
         (asCollision, deadAsCollision, scoreAs) = asteroidAllCollision gstate
 
 

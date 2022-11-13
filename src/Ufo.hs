@@ -46,7 +46,7 @@ shoot p ufo | timeSinceShot ufo > shootSpeed = (ufo {timeSinceShot = resetTime},
 ufoShootDirection :: Ufo -> Player -> Vector
 ufoShootDirection ufo p = vectorScale direction (1 / vectorLength direction)
     where
-        directionFront  = vectorSubstract (position (locationUfo ufo)) (vectorAdd (position (locationUfo ufo)) (velocity (locationUfo ufo)))
+        directionFront  = vectorSubstract (position (locationUfo ufo)) (vectorSubstract (position (locationUfo ufo)) (velocity (locationUfo ufo)))
         directionPlayer = vectorSubstract (position (locationPlayer p)) (position (locationUfo ufo))
         direction = case aim ufo of
                     FrontAim  -> directionFront

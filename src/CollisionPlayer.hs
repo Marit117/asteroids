@@ -11,7 +11,7 @@ playerBullet :: [Bullet] -> Player -> Bool
 playerBullet bs p = any (\b -> vectorCollision (position (locationBullet b)) (position (locationPlayer p)) bulletPlayerRadius) bs
 
 playerAsteroid :: [Asteroid] -> Player -> Bool
-playerAsteroid as p = any (collisionAsteroid (position (locationPlayer p))) as
+playerAsteroid as p = any (collisionAsteroid (position (locationPlayer p)) asteroidPlayerRadius) as
 
 playerUfo :: [Ufo] -> Player -> Bool
 playerUfo us p = any (\ufo -> vectorCollision (position (locationUfo ufo)) (position (locationPlayer p)) ufoPlayerRadius) us

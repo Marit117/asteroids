@@ -8,7 +8,7 @@ bulletAllCollision :: [Asteroid] -> [Ufo] -> Player -> [Bullet] -> [Bullet]
 bulletAllCollision as us p bs = bulletAsteroid as $ bulletPlayer p $ bulletUfo us bs
 
 bulletAsteroid :: [Asteroid] -> [Bullet] -> [Bullet]
-bulletAsteroid as = filter ( \b -> not $ any (collisionAsteroid (position (locationBullet b))) as)
+bulletAsteroid as = filter ( \b -> not $ any (collisionAsteroid (position (locationBullet b)) asteroidBulletRadius) as)
 
 bulletPlayer :: Player -> [Bullet] -> [Bullet]
 bulletPlayer p = filter (\b -> not $ vectorCollision (position (locationBullet b)) (position (locationPlayer p)) bulletPlayerRadius)
