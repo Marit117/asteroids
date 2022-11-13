@@ -30,6 +30,6 @@ collisionAsteroid :: Vector -> Asteroid -> Bool
 collisionAsteroid v a = vectorCollision v (position (locationAsteroid a)) n
     where
         n = case size a of -- different size asteroids should have a different radius for collision
-          Small  -> asteroidSmallCollision
-          Medium -> asteroidMediumCollision
-          Large  -> asteroidLargeCollision
+          Small  -> asteroidSmallRadius
+          Medium -> asteroidMediumRadius
+          Large  -> asteroidLargeRadius

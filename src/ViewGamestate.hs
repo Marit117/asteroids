@@ -9,16 +9,16 @@ viewGstate gstate = Pictures [viewScore (score gstate), viewLives (player gstate
                               Pictures (viewAsteroids (asteroids gstate)), Pictures (viewDeadAsteroids (deadAsteroids gstate)), Pictures (viewUfo (ufos gstate))]
 
 viewLives :: Player -> Picture
-viewLives p = translate (-375) 350 $ scale 0.2 0.2 $ color white $ Text ("Lives: " ++ show (lives p))
+viewLives p = translate (-375) 350 $ smallerText $ color white $ Text ("Lives: " ++ show (lives p))
 
 viewScore :: Int -> Picture
-viewScore score = translate 200 350 $ scale 0.2 0.2 $ color white $ Text ("Score: " ++ show score)
+viewScore score = translate 200 350 $ smallerText $ color white $ Text ("Score: " ++ show score)
 
 viewPlayer :: Player -> Picture
-viewPlayer p = uncurry translate (position (locationPlayer p)) $ rotate (angle p) $ color white $ Polygon [(0, 20), (20, -10), (0, 0), (-20, -10)]
+viewPlayer p = uncurry translate (position (locationPlayer p)) $ rotate (angle p) $ color white $ Polygon playerOutline
 
 viewBullets :: [Bullet] -> [Picture]
-viewBullets = map (\bullet -> uncurry translate (position (locationBullet bullet)) $ color white $ circleSolid 3)
+viewBullets = map (\bullet -> uncurry translate (position (locationBullet bullet)) $ color white $ circleSolid bulletSize)
 
 viewAsteroids :: [Asteroid] -> [Picture]
 viewAsteroids = map (\asteroid -> uncurry translate (position (locationAsteroid asteroid)) $ color white $ asteroidLine asteroid)
@@ -35,4 +35,4 @@ viewDeadAsteroids = map (\asteroid -> uncurry translate (deathPosition asteroid)
         adjustSize da = map (`vectorScale` (asteroidScaleSmall - timeSinceDeath da)) asteroidOutline
 
 viewUfo :: [Ufo] -> [Picture]
-viewUfo = map (\ufo -> uncurry translate (position (locationUfo ufo)) $ color white $ Line [(15, 0), (10, 15), (0, 20), (-10, 15), (-15, 0), (-25, -10), (-10, -15), (10, -15), (25, -10), (15, 0), (-15, 0)])
+viewUfo = map (\ufo -> uncurry translate (position (locationUfo ufo)) $ color white $ Line ufoOutline)

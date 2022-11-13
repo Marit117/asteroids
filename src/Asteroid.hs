@@ -14,9 +14,9 @@ asteroidRandom :: StdGen ->  (Asteroid, StdGen)
 asteroidRandom r1 = (Asteroid {size = Large, locationAsteroid = LocationData { velocity = vel, position = pos }}, r3)
     where
         vel                = rotate (0, speed) rot
-        pos                = (posx, 400)
-        (posx, r3)         = randomR (-400, 400) r2
-        ((rot, speed), r2) = randomR ((0,20), (360,100)) r1
+        pos                = (posx, halfScreen)
+        (posx, r3)         = randomR screenSize r2
+        ((rot, speed), r2) = randomR (randomRotation, randomSpeed) r1
 
 -- Asteroids that are hit break into two smaller asteroids
 -- if they cannot go smaller, the asteroid dies
@@ -26,4 +26,4 @@ killAsteroid (a:as) | size a > Small = let (alive, dead) = killAsteroid as in
                         (Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) newAsteroidSpeedLow}} :
                          Asteroid {size = pred (size a), locationAsteroid = (locationAsteroid a) {velocity = vectorScale (velocity (locationAsteroid a)) newAsteroidSpeedHigh}} : 
                          alive, dead)
-                    | otherwise = let (alive, dead) = killAsteroid as in (alive, DeadAsteroid {deathPosition = position (locationAsteroid a), timeSinceDeath = 0} : dead)
+                    | otherwise = let (alive, dead) = killAsteroid as in (alive, DeadAsteroid {deathPosition = position (locationAsteroid a), timeSinceDeath = resetTime} : dead)

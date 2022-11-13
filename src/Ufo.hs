@@ -11,20 +11,20 @@ moveUfo secs = map (\ufo -> ufo { locationUfo = updatePosition (locationUfo ufo)
 
 -- Ufo added with random direction, speed and aim
 ufoRandom :: StdGen ->  (Ufo, StdGen)
-ufoRandom r1 = (Ufo {aim = rAim, timeSinceShot = 0, locationUfo = LocationData { velocity = vel, position = pos }}, r4)
+ufoRandom r1 = (Ufo {aim = rAim, timeSinceShot = resetTime, locationUfo = LocationData { velocity = vel, position = pos }}, r4)
     where
         vel                = rotate (0, speed) rot
-        pos                = (400, posy)
-        (posy, r3)         = randomR (-400, 400) r2
+        pos                = (halfScreen, posy)
+        (posy, r3)         = randomR screenSize r2
         (rAim, r4)         = ufoRandomAim r3
-        ((rot, speed), r2) = randomR ((0,20), (360,100)) r1
+        ((rot, speed), r2) = randomR (randomRotation, randomSpeed) r1
 
 ufoRandomAim :: StdGen -> (Aim, StdGen)
-ufoRandomAim r | n >= 50   = (PlayerAim, newr)
-               | otherwise = (FrontAim, newr)
+ufoRandomAim r | n >= chancePlayerAim = (PlayerAim, newr)
+               | otherwise            = (FrontAim, newr)
     where
         n :: Int
-        (n, newr) = randomR (1, 100) r
+        (n, newr) = randomR randomChance r
 
 -- Ufo shoots every few seconds
 ufoUpdateTime :: Time -> [Ufo] -> [Ufo]
@@ -36,8 +36,8 @@ ufosShoot p bs us = (newUfo, concat addBullet ++ bs)
         (newUfo, addBullet) = unzip $ map (shoot p) us
 
 shoot :: Player -> Ufo -> (Ufo, [Bullet])
-shoot p ufo | timeSinceShot ufo > 1 = (ufo {timeSinceShot = 0}, [Bullet (LocationData vel pos) 1])
-            | otherwise             = (ufo, [])
+shoot p ufo | timeSinceShot ufo > shootSpeed = (ufo {timeSinceShot = resetTime}, [Bullet (LocationData vel pos) ufoBulletLifeTime])
+            | otherwise                      = (ufo, [])
     where
         vel       = vectorAdd (vectorScale direction bulletSpeed) (velocity (locationUfo ufo))
         pos       = vectorAdd (vectorScale direction bulletStartPosition) (position (locationUfo ufo))
